@@ -10,7 +10,7 @@ class Arduino : public QSerialPort
 public:
     Arduino();
 
-    /* Найти подключенный ардуино */
+    /* Поиск порта с ардуинкой и подключение к нему*/
     bool findArduino();
 
     /* Поверернуть бэтта на количество шагов */
@@ -18,6 +18,8 @@ public:
 
     /* Повернуть фи на количество шагов */
     bool fiRevolutionOnSteps(int stepsNumber);
+
+
 
 };
 

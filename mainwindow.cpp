@@ -5,29 +5,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    QTime midnight(0,0,0);
-    qsrand(midnight.secsTo(QTime::currentTime()));
-    startTime = QTime::currentTime();
-
     ui->setupUi(this);
 
-    QTimer *timer = new QTimer;
-    timer->setInterval(1000);
-    connect(timer, &QTimer::timeout, this, &readData);
-    timer->start();
-
-    //plot_->setAnimationOptions(QChart::AllAnimations);
-    view->setRenderHint(QPainter::Antialiasing);
-    plot_->legend()->hide();
-    plot_->addSeries(curve_);
-    plot_->addSeries(curveMean_);
-    plot_->createDefaultAxes();
-    plot_->axisY()->setRange(-1,1);
-    //plot_->margins().setRight(0);
-    plot_->setTitle("P 1-3");
+    rHight.resize(5);
+    for(auto sensor: rHight)
+        rHight << new Sensor();
 
 
-    ui->P13_1->setViewport(view);
 }
 
 MainWindow::~MainWindow()
@@ -36,42 +20,30 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_findArduino_clicked()
 {
     if (arduino.findArduino())
     {
-        ui->pushButton->hide();
+        ui->findArduino->hide();
         ui->label->setText("Arduino on " + arduino.portName());
         connect(&arduino, &Arduino::readyRead, this, &readData);
-
     }
 }
 
 void MainWindow::readData()
 {
-//    if(arduino.isReadable()) QByteArray arr = arduino.readAll();
-//    int i = arr[0];
-//    qDebug() << arr << " " << i;
-//    ui->textBrowser->append(arr);
-    int ms = startTime.secsTo(QTime::currentTime());
-    *curve_ << QPointF(ms, qSin(ms)/ms);
-    if (ms >= 15) *curveMean_ << QPointF(ms, mean(curve_, 15));
-    plot_->axisX()->setRange(0, ms);
-}
-
-double MainWindow::mean(QSplineSeries *series, int ms)
-{
-    double summ=0;
-    for (int i = ms; i < series->count(); ++i)
-    {
-        summ += series->at(i).y();
+    if(arduino.isReadable()) {
+        QByteArray arr = arduino.readAll();
+        quint8 i = arr[0];
+        quint16 value = (arr.at(1) << 8) + (quint8) arr.at(2);
+        //sensors.at(i)->getSeries()->append(i, value);
+        quint8 crc8 = arr[7];
+        qDebug() << i << " " << value << endl;
     }
-    //ui->label_2->setText("Среднее интегральное: " + QString::number(summ/(series->count()-ms)));
-    return summ/((series->count()-ms));
 }
 
-/* Выставление шага изменения угла и округляет
- * введенное значение */
+/* Выставление шага изменения угла и округление
+ * введенного значения */
 void MainWindow::on_fiStep_editingFinished()
 {
     double step = ui->fiStep->value();

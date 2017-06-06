@@ -25,10 +25,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    arduino.cpp
+    arduino.cpp \
+    sensor.cpp
 
 HEADERS  += mainwindow.h \
-    arduino.h
+    arduino.h \
+    sensor.h
 
 FORMS    += mainwindow.ui
 

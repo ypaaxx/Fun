@@ -3,12 +3,12 @@
 
 #include <QMainWindow>
 #include <QDebug>
-
+#include <QVector>
 #include "QTime"
 #include "QTimer"
 #include "QtMath"
-#include "QtCharts"
 
+#include "sensor.h"
 #include "arduino.h"
 
 namespace Ui {
@@ -24,29 +24,26 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_findArduino_clicked();
     void readData();
+
     void on_fiStep_editingFinished();
-
     void on_bettaStep_editingFinished();
-
     void on_betta_editingFinished();
-
     void on_fi_editingFinished();
 
 private:
     Ui::MainWindow *ui;
-
     Arduino arduino;
 
-    QTime startTime;
-    QChart* plot_ = new QChart;
+    /* Нумерация датчиков:
+     * 0 - центральный
+     * 1 - верхний
+     * остальные против часовой */
+    QVector <Sensor> rHight, rMiddle, rLow;
 
-    QSplineSeries* curve_ = new QSplineSeries();
-    QSplineSeries* curveMean_ = new QSplineSeries();
-    QChartView *view = new QChartView(plot_);
-    //QValueAxis *x_axis;
-    double mean(QSplineSeries *series, int ms);
+    Sensor temperature;
+
 };
 
 #endif // MAINWINDOW_H

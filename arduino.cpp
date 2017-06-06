@@ -4,16 +4,17 @@ Arduino::Arduino()
 {
 
 }
-
+/* Поиск порта с ардуинкой и подключение к нему*/
 bool Arduino::findArduino()
 {
     /* Поиск порта с ардуинкой */
     QList <QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
-    if(ports.isEmpty())
-    {
+    if(ports.isEmpty()){
         qDebug() << "Нет COM портов ;-(";
         return 0;
     }
+
+
     for (QSerialPortInfo& port: ports){
         if ( port.hasVendorIdentifier() )
             if( (port.vendorIdentifier() == 0x2341)
@@ -23,7 +24,8 @@ bool Arduino::findArduino()
         setPort(port);
     }
 
-    setBaudRate(QSerialPort::Baud115200);
+    /* Настройки COM порта */
+    setBaudRate(QSerialPort::Baud9600);
     setDataBits(QSerialPort::Data8);
     setStopBits(QSerialPort::OneStop);
     setParity(QSerialPort::NoParity);
@@ -31,5 +33,4 @@ bool Arduino::findArduino()
     open(QIODevice::ReadOnly);
 
     return 1;
-
 }
