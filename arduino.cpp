@@ -4,6 +4,7 @@ Arduino::Arduino()
 {
 
 }
+
 /* Поиск порта с ардуинкой и подключение к нему*/
 bool Arduino::findArduino()
 {

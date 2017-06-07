@@ -385,10 +385,10 @@
     </property>
     <layout class="QGridLayout" name="layout">
      <item row="0" column="0">
-      <widget class="QGraphicsView" name="delataPHight"/>
+      <widget class="QChartView" name="deltaPHight"/>
      </item>
      <item row="1" column="0">
-      <widget class="QGraphicsView" name="delataPMiddle"/>
+      <widget class="QGraphicsView" name="deltaPMiddle"/>
      </item>
      <item row="2" column="0">
       <widget class="QGraphicsView" name="delataPLow"/>
@@ -451,6 +451,13 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header>qchartview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

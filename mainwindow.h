@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -37,13 +37,25 @@ private:
     Arduino arduino;
 
     /* Нумерация датчиков:
-     * 0 - центральный
-     * 1 - верхний
-     * остальные против часовой */
-    QVector <Sensor> rHight, rMiddle, rLow;
+     * 0 - центральный (полное)
+     * 1 - разность левого и правого
+     * 2 - значение левого и правого
+     * 3 - верхний
+     * 4 - нижний */
+    QVector <Sensor> *rHight;
+    QVector <Sensor> *rMiddle;
+    QVector <Sensor> *rLow;
+    Sensor temperature; //Температурный датчик в корпусе
+    QVector <Sensor*> allSensors; //Список всех сенсоров
 
-    Sensor temperature;
+    //Таймер
+    QTime time;
 
+    //Файлы логов
+    QFile log;
+    QTextStream logStream;
+
+    quint8 crc8(QByteArray &array, quint8 len);
 };
 
 #endif // MAINWINDOW_H

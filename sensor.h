@@ -1,28 +1,30 @@
 #ifndef SENSOR_H
 #define SENSOR_H
 
-#include <QObject>
 #include <QtCharts>
 
-class Sensor : public QObject
+class Sensor
 {
-    Q_OBJECT
-
+    static quint8 count;
 private:
-    quint8 id_;
-    QString name = "Jopa";
+
+    quint8 id;
     QChart *chart;
     QChartView *view;
-    QLineSeries *p_t;
+    QLineSeries *lineSeries;
 
 public:
-    explicit Sensor(QObject *parent = 0);
-    QChartView *getView(){ return view; }
-    QLineSeries *getSeries() { return p_t; }
+    Sensor();
 
+    QChartView *getView() const { return view; }
+    QLineSeries *getSeries() const { return lineSeries; }
+    QChart *getChart() const { return chart; }
+
+    void setView(QChartView *view);
 signals:
 
 public slots:
 };
+
 
 #endif // SENSOR_H
