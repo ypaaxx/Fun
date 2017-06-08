@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>687</width>
-    <height>478</height>
+    <width>937</width>
+    <height>757</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -64,7 +64,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>560</x>
       <y>10</y>
       <width>161</width>
       <height>91</height>
@@ -228,7 +228,7 @@
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>730</x>
       <y>10</y>
       <width>201</width>
       <height>91</height>
@@ -379,37 +379,58 @@
      <rect>
       <x>10</x>
       <y>110</y>
-      <width>651</width>
-      <height>311</height>
+      <width>921</width>
+      <height>591</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="layout">
-     <item row="0" column="0">
-      <widget class="QChartView" name="deltaPHight"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QGraphicsView" name="deltaPMiddle"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QGraphicsView" name="delataPLow"/>
-     </item>
-     <item row="0" column="1">
-      <widget class="QGraphicsView" name="pHight"/>
-     </item>
      <item row="2" column="1">
-      <widget class="QGraphicsView" name="pLow"/>
-     </item>
-     <item row="0" column="2">
-      <widget class="QGraphicsView" name="fiHight"/>
-     </item>
-     <item row="1" column="2">
-      <widget class="QGraphicsView" name="fiMiddle"/>
+      <widget class="QChartView" name="deltaPLow"/>
      </item>
      <item row="2" column="2">
-      <widget class="QGraphicsView" name="fiLow"/>
+      <widget class="QChartView" name="pLow"/>
+     </item>
+     <item row="2" column="3">
+      <widget class="QChartView" name="fiLow"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="QChartView" name="deltaPHight"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="QChartView" name="fiMiddle"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QChartView" name="pHight"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QChartView" name="pMiddle"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="QChartView" name="fiHight"/>
      </item>
      <item row="1" column="1">
-      <widget class="QGraphicsView" name="pMiddle"/>
+      <widget class="QChartView" name="deltaPMiddle"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="pushHight">
+       <property name="text">
+        <string>Взять</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="pushMiddle">
+       <property name="text">
+        <string>Взять</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="pushLow">
+       <property name="text">
+        <string>Взять</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -422,7 +443,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>687</width>
+     <width>937</width>
      <height>21</height>
     </rect>
    </property>

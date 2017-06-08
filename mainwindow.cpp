@@ -7,12 +7,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
     time.start();
     log.setFileName("time.txt");
     log.open(QIODevice::WriteOnly);
     logStream.setDevice(&log);
     logStream << "# time (ms); numer of sensor; value(Pa); message;" << endl;
+
+    experiment.setFileName(QDate::currentDate().toString("experiments/yyyy.MM.dd_hh.mm.txt"));
+    experiment.open(QIODevice::ReadOnly);
+    experimentStream.setDevice(&experiment);
 
     /* По пять датчиков на каждом насадке */
     rHight = new QVector <Sensor> (5);
@@ -28,7 +31,31 @@ MainWindow::MainWindow(QWidget *parent) :
     for (Sensor &sensor: *rLow)
         allSensors << &sensor;
 
-    ui->deltaPHight->setChart(rHight->at(0).getChart());
+    //Псевдо датчики угла
+    rHight->resize(6);
+    rMiddle->resize(6);
+    rLow->resize(6);
+
+    angleHight = &rHight[5];
+    angleMiddle = rMiddle[5];
+    angleLow = rLow[5];
+
+    /* Назначение графиков разности давлений */
+    ui->deltaPHight->setChart(rHight->at(1).getChart());
+    ui->deltaPMiddle->setChart(rMiddle->at(1).getChart());
+    ui->deltaPLow->setChart(rLow->at(1).getChart());
+
+    /* Назначение графиков полных давлений */
+    ui->pHight->setChart(rHight->at(0).getChart());
+    ui->pMiddle->setChart(rMiddle->at(0).getChart());
+    ui->pLow->setChart(rLow->at(0).getChart());
+
+    /* Назначение графиков углов */
+    angleHight->getChart()->axisX()->setRange(-24, 24);
+    angleHight->getChart()->axisY()->setRange(-180, 180);
+    ui->fiHight->setChart(angleHight->getChart());
+    ui->fiMiddle->setChart(angleMiddle->getChart());
+    ui->fiLow->setChart(angleLow->getChart());
 
 
 }
@@ -37,6 +64,8 @@ MainWindow::~MainWindow()
 {
     arduino.close();
     log.close();
+    experiment.close();
+
     delete ui;
 }
 
@@ -57,21 +86,26 @@ void MainWindow::on_findArduino_clicked()
 void MainWindow::readData()
 {
     if(arduino.isReadable()) {
-        QByteArray arr = arduino.readAll();
-        quint8 numerSensor = arr[0]; // Номер сенсора
-        quint16 value = (arr.at(1) << 8) + (quint8) arr.at(2); // Значение от сенсора
-        quint8 crc = arr[7]; // Контрольная сумма
-        if (crc == crc8(arr, 7)){
-            allSensors.at(numerSensor)->getSeries()->append(time.elapsed()/1000, value);
+        QByteArray message = arduino.readAll();
+        quint8 numerSensor = message[0]; // Номер сенсора
+        quint16 value = (message.at(1) << 8) + (quint8) message.at(2); // Значение от сенсора
+        quint16 betta = (message.at(3) << 8) + (quint8) message.at(4); // Betta
+        quint16 fi = (message.at(5) << 8) + (quint8) message.at(6); // Fi
+        quint8 crc = message[7]; // Контрольная сумма
+        if (crc == crc8(message, 7)){
+            allSensors.at(numerSensor)->getSeries()->append(time.elapsed()/1000, value); //время в секундах
+
             logStream << time.elapsed() << "; ";
             logStream << numerSensor << "; ";
             logStream << value << "; ";
-            for (auto byte: arr)
-                logStream << hex << byte;
+            logStream << fi << "; ";
+            logStream << betta << "; ";
+            for (auto byte: message)
+                logStream << bin << byte;
             logStream << "; ";
             logStream << dec << endl;
         }
-        qDebug() << numerSensor << " " << value;
+        //qDebug() << numerSensor << " " << value;
         //qDebug() << crc << " " << crc8(arr, 7);
     }
 }
@@ -123,4 +157,31 @@ quint8 MainWindow::crc8(QByteArray &array, quint8 len)
     return crc;
 }
 
+/* Запись данных по кнопке для распихивания по кнопкам */
+void MainWindow::getData(QVector <Sensor> *radius){
 
+    auto angle = radius->at(5);
+    radius->at(5).getSeries()->append(bettaCurrent, fiCurrent);
+
+    for (qint8 i = 0; i < 5; ++i)
+            experimentStream << radius->at(i).getSeries()->points().back().y() << "; ";
+    experimentStream << angle.getSeries()->points().back().x();
+    experimentStream << angle.getSeries()->points().back().y();
+
+}
+
+/* Взятие данных с верхнего радиуса */
+void MainWindow::on_pushHight_clicked()
+{
+    getData(rHight);
+}
+
+void MainWindow::on_pushMiddle_clicked()
+{
+    getData(rMiddle);
+}
+
+void MainWindow::on_pushLow_clicked()
+{
+    getData(rLow);
+}
