@@ -49,9 +49,9 @@ private:
      * 2 - значение левого и правого
      * 3 - верхний
      * 4 - нижний */
-    QVector <Sensor> *rHight;
-    QVector <Sensor> *rMiddle;
-    QVector <Sensor> *rLow;
+    QVector <Sensor*> *rHight;
+    QVector <Sensor*> *rMiddle;
+    QVector <Sensor*> *rLow;
     Sensor temperature; //Температурный датчик в корпусе
     QVector <Sensor*> allSensors; //Список всех реальных сенсоров
     Sensor* angleHight;// Фиктивные датчики угла
@@ -71,7 +71,7 @@ private:
     QTextStream experimentStream;
 
     quint8 crc8(QByteArray &array, quint8 len);
-    void getData(QVector<Sensor> *radius);
+    void getData(QVector<Sensor *> *radius);
 };
 
 #endif // MAINWINDOW_H

@@ -17,38 +17,44 @@ MainWindow::MainWindow(QWidget *parent) :
     experiment.open(QIODevice::ReadOnly);
     experimentStream.setDevice(&experiment);
 
-    /* По пять датчиков на каждом насадке */
-    rHight = new QVector <Sensor> (5);
-    rMiddle = new QVector <Sensor> (5);
-    rLow = new QVector <Sensor> (5);
+    /* По пять датчиков на каждом насадке и фиктивный угла */
+    rHight = new QVector <Sensor*> (5);
+    for(Sensor* &sensor: *rHight)
+        sensor = new Sensor();
+    rMiddle = new QVector <Sensor*> (5);
+    for(Sensor* &sensor: *rMiddle)
+        sensor = new Sensor();
+    rLow = new QVector <Sensor*> (5);
+    for(Sensor* &sensor: *rLow)
+        sensor = new Sensor();
 
     /* Добавим в allSensors ссылки на сенсоры */
     allSensors << &temperature;
-    for (Sensor &sensor: *rHight)
-        allSensors << &sensor;
-    for (Sensor &sensor: *rMiddle)
-        allSensors << &sensor;
-    for (Sensor &sensor: *rLow)
-        allSensors << &sensor;
+    for (Sensor* sensor: *rHight)
+        allSensors << sensor;
+    for (Sensor* sensor: *rMiddle)
+        allSensors << sensor;
+    for (Sensor* sensor: *rLow)
+        allSensors << sensor;
 
     //Псевдо датчики угла
-    rHight->resize(6);
-    rMiddle->resize(6);
-    rLow->resize(6);
+    angleHight = new Sensor();
+    angleMiddle = new Sensor();
+    angleLow = new Sensor();
 
-    angleHight = &rHight[5];
-    angleMiddle = rMiddle[5];
-    angleLow = rLow[5];
+    rHight->append(angleHight);
+    rMiddle->append(angleMiddle);
+    rLow->append(angleLow);
 
     /* Назначение графиков разности давлений */
-    ui->deltaPHight->setChart(rHight->at(1).getChart());
-    ui->deltaPMiddle->setChart(rMiddle->at(1).getChart());
-    ui->deltaPLow->setChart(rLow->at(1).getChart());
+    ui->deltaPHight->setChart(rHight->at(1)->getChart());
+    ui->deltaPMiddle->setChart(rMiddle->at(1)->getChart());
+    ui->deltaPLow->setChart(rLow->at(1)->getChart());
 
     /* Назначение графиков полных давлений */
-    ui->pHight->setChart(rHight->at(0).getChart());
-    ui->pMiddle->setChart(rMiddle->at(0).getChart());
-    ui->pLow->setChart(rLow->at(0).getChart());
+    ui->pHight->setChart(rHight->at(0)->getChart());
+    ui->pMiddle->setChart(rMiddle->at(0)->getChart());
+    ui->pLow->setChart(rLow->at(0)->getChart());
 
     /* Назначение графиков углов */
     angleHight->getChart()->axisX()->setRange(-24, 24);
@@ -158,15 +164,15 @@ quint8 MainWindow::crc8(QByteArray &array, quint8 len)
 }
 
 /* Запись данных по кнопке для распихивания по кнопкам */
-void MainWindow::getData(QVector <Sensor> *radius){
+void MainWindow::getData(QVector <Sensor*> *radius){
 
     auto angle = radius->at(5);
-    radius->at(5).getSeries()->append(bettaCurrent, fiCurrent);
+    radius->at(5)->getSeries()->append(bettaCurrent, fiCurrent);
 
     for (qint8 i = 0; i < 5; ++i)
-            experimentStream << radius->at(i).getSeries()->points().back().y() << "; ";
-    experimentStream << angle.getSeries()->points().back().x();
-    experimentStream << angle.getSeries()->points().back().y();
+            experimentStream << radius->at(i)->getSeries()->points().back().y() << "; ";
+    experimentStream << angle->getSeries()->points().back().x();
+    experimentStream << angle->getSeries()->points().back().y();
 
 }
 
