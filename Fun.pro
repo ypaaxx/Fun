@@ -8,6 +8,8 @@ QT       += core gui serialport charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+CONFIG += exeptions
+
 TARGET = Fun
 TEMPLATE = app
 
@@ -26,11 +28,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     arduino.cpp \
-    sensor.cpp
+    sensor.cpp \
+    crc.cpp \
+    experiment.cpp
 
 HEADERS  += mainwindow.h \
     arduino.h \
-    sensor.h
+    sensor.h \
+    crc.h \
+    experiment.h
 
 FORMS    += mainwindow.ui
 

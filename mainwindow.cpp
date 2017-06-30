@@ -7,113 +7,63 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    time.start();
-    log.setFileName("time.txt");
-    log.open(QIODevice::WriteOnly);
-    logStream.setDevice(&log);
-    logStream << "# time (ms); numer of sensor; value(Pa); message;" << endl;
-
-    experiment.setFileName(QDate::currentDate().toString("experiments/yyyy.MM.dd_hh.mm.txt"));
-    experiment.open(QIODevice::ReadOnly);
-    experimentStream.setDevice(&experiment);
-
-    /* По пять датчиков на каждом насадке и фиктивный угла */
-    rHight = new QVector <Sensor*> (5);
-    for(Sensor* &sensor: *rHight)
-        sensor = new Sensor();
-    rMiddle = new QVector <Sensor*> (5);
-    for(Sensor* &sensor: *rMiddle)
-        sensor = new Sensor();
-    rLow = new QVector <Sensor*> (5);
-    for(Sensor* &sensor: *rLow)
-        sensor = new Sensor();
-
-    /* Добавим в allSensors ссылки на сенсоры */
-    allSensors << &temperature;
-    for (Sensor* sensor: *rHight)
-        allSensors << sensor;
-    for (Sensor* sensor: *rMiddle)
-        allSensors << sensor;
-    for (Sensor* sensor: *rLow)
-        allSensors << sensor;
-
-    //Псевдо датчики угла
-    angleHight = new Sensor();
-    angleMiddle = new Sensor();
-    angleLow = new Sensor();
-
-    rHight->append(angleHight);
-    rMiddle->append(angleMiddle);
-    rLow->append(angleLow);
-
     /* Назначение графиков разности давлений */
-    ui->deltaPHight->setChart(rHight->at(1)->getChart());
-    ui->deltaPMiddle->setChart(rMiddle->at(1)->getChart());
-    ui->deltaPLow->setChart(rLow->at(1)->getChart());
+    ui->deltaPHight->setChart(experiment.getRHight()->at(1)->getChart());
+    ui->deltaPMiddle->setChart(experiment.getRMiddle()->at(1)->getChart());
+    ui->deltaPLow->setChart(experiment.getRLow()->at(1)->getChart());
 
     /* Назначение графиков полных давлений */
-    ui->pHight->setChart(rHight->at(0)->getChart());
-    ui->pMiddle->setChart(rMiddle->at(0)->getChart());
-    ui->pLow->setChart(rLow->at(0)->getChart());
+    ui->pHight->setChart(experiment.getRHight()->at(0)->getChart());
+    ui->pMiddle->setChart(experiment.getRMiddle()->at(0)->getChart());
+    ui->pLow->setChart(experiment.getRLow()->at(0)->getChart());
 
     /* Назначение графиков углов */
-    angleHight->getChart()->axisX()->setRange(-24, 24);
-    angleHight->getChart()->axisY()->setRange(-180, 180);
-    ui->fiHight->setChart(angleHight->getChart());
-    ui->fiMiddle->setChart(angleMiddle->getChart());
-    ui->fiLow->setChart(angleLow->getChart());
-
-
+    experiment.getAngleHight()->getChart()->axisX()->setRange(-24, 24);
+    experiment.getAngleHight()->getChart()->axisY()->setRange(-180, 180);
+    experiment.getAngleHight()->noScroll(); //Не прокручивать графики
 }
 
 MainWindow::~MainWindow()
 {
-    arduino.close();
-    log.close();
-    experiment.close();
-
+    if (arduino.isOpen()) arduino.close();
     delete ui;
 }
 
 /* При нажатии на поиск ардуинки вызывает функцию поиска findArduino
- * и при успехе конектит readyRead ардуины к слоту readData */
+ * и при успехе конектит readyRead ардуины к слоту readData
+ * меняет назначение кнопки на отключение от ардуины */
 void MainWindow::on_findArduino_clicked()
 {
-    if (arduino.findArduino())
-    {
-        ui->findArduino->hide();
-        ui->label->setText("Arduino on " + arduino.portName());
-        connect(&arduino, &Arduino::readyRead, this, &readData);
+    if(arduino.isOpen()) {
+        disconnect(&arduino, &Arduino::readyRead, this, &readData);
+        arduino.close();
+        ui->label->setText("Найти ардуину");
+        return;
     }
+    if (!arduino.findArduino()) return;
+    ui->label->setText("Arduino on " + arduino.portName());
+    ui->findArduino->setText("Close arduino");
+    connect(&arduino, &Arduino::readyRead, this, &readData);
 }
 
 /* Вызывается при появлении данных от ардуинки, читает сообщение
  * проверяет, пишет куда надо */
 void MainWindow::readData()
 {
-    if(arduino.isReadable()) {
-        QByteArray message = arduino.readAll();
-        quint8 numerSensor = message[0]; // Номер сенсора
-        quint16 value = (message.at(1) << 8) + (quint8) message.at(2); // Значение от сенсора
-        quint16 betta = (message.at(3) << 8) + (quint8) message.at(4); // Betta
-        quint16 fi = (message.at(5) << 8) + (quint8) message.at(6); // Fi
-        quint8 crc = message[7]; // Контрольная сумма
-        if (crc == crc8(message, 7)){
-            allSensors.at(numerSensor)->getSeries()->append(time.elapsed()/1000, value); //время в секундах
-
-            logStream << time.elapsed() << "; ";
-            logStream << numerSensor << "; ";
-            logStream << value << "; ";
-            logStream << fi << "; ";
-            logStream << betta << "; ";
-            for (auto byte: message)
-                logStream << bin << byte;
-            logStream << "; ";
-            logStream << dec << endl;
+        quint8 numerSensor;
+        quint16 value;
+        quint16 fi;
+        quint16 betta;
+        /* При совпадении crc запись в лог и серии датчика */
+        if(arduino.read(numerSensor, value, fi, betta))
+        {
+            experiment.addData(numerSensor, value);
+            //fiCurrent = fi*stpFi - 180;
+            //bettaCurrent = betta*stpBetta - 24;
         }
-        //qDebug() << numerSensor << " " << value;
-        //qDebug() << crc << " " << crc8(arr, 7);
-    }
+
+        //ui->valueFi->setText(QString::number(fiCurrent) + "°");
+        //ui->valueBetta->setText(QString::number(bettaCurrent) + "°");
 }
 
 /* Выставление шага изменения угла и округление
@@ -121,73 +71,116 @@ void MainWindow::readData()
 void MainWindow::on_fiStep_editingFinished()
 {
     double step = ui->fiStep->value();
-    int nStep = step/0.25;
-    step = 0.25*nStep;
+    int nStep = step/Arduino::stpFi;
+    step = Arduino::stpFi*nStep;
     ui->fiStep->setValue(step);
     ui->fi->setSingleStep(step);
 }
 void MainWindow::on_bettaStep_editingFinished()
 {
     double step = ui->bettaStep->value();
-    int nStep = step/0.125;
-    step = 0.125*nStep;
+    int nStep = step/Arduino::stpBetta;
+    step = Arduino::stpBetta*nStep;
     ui->bettaStep->setValue(step);
     ui->betta->setSingleStep(step);
 }
 void MainWindow::on_betta_editingFinished()
 {
     double step = ui->betta->value();
-    int nStep = step/0.125;
-    step = 0.125*nStep;
+    int nStep = step/Arduino::stpBetta;
+    step = Arduino::stpBetta*nStep;
     ui->betta->setValue(step);
 }
 void MainWindow::on_fi_editingFinished()
 {
     double step = ui->fi->value();
-    int nStep = step/0.25;
-    step = 0.25*nStep;
+    int nStep = step/Arduino::stpFi;
+    step = Arduino::stpFi*nStep;
     ui->fi->setValue(step);
-}
-
-/* Вычисление контрольной суммы */
-quint8 MainWindow::crc8(QByteArray &array, quint8 len)
-{
-    //ОНо рабОТатЕт!!1111АДИН
-    quint8 crc = 0x00;
-    for( qint8 num = 0; num < len; ++num){
-        crc ^= array[num];
-        for (quint8 i = 0; i < 8; i++)
-            crc = crc & 0x80 ? (crc << 1) ^ 0x07 : crc << 1;
-    }
-
-    return crc;
 }
 
 /* Запись данных по кнопке для распихивания по кнопкам */
 void MainWindow::getData(QVector <Sensor*> *radius){
+/*
+    if (!arduino.isOpen()) return;
 
     auto angle = radius->at(5);
     radius->at(5)->getSeries()->append(bettaCurrent, fiCurrent);
 
     for (qint8 i = 0; i < 5; ++i)
-            experimentStream << radius->at(i)->getSeries()->points().back().y() << "; ";
-    experimentStream << angle->getSeries()->points().back().x();
-    experimentStream << angle->getSeries()->points().back().y();
+        experimentStream << radius->at(i)->getSeries()->points().back().y() << "; ";
+    experimentStream << angle->getSeries()->points().back().x(); //betta
+    experimentStream << angle->getSeries()->points().back().y(); //fi
 
+    experimentStream << endl;
+    experiment.flush();
+*/
 }
 
 /* Взятие данных с верхнего радиуса */
 void MainWindow::on_pushHight_clicked()
 {
-    getData(rHight);
+//    experimentStream << "Hight; ";
+//    getData(rHight);
 }
 
 void MainWindow::on_pushMiddle_clicked()
 {
-    getData(rMiddle);
+//    experimentStream << "Middle; ";
+//    getData(rMiddle);
 }
 
 void MainWindow::on_pushLow_clicked()
 {
-    getData(rLow);
+//    experimentStream << "Low; ";
+//    getData(rLow);
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    quint16 f = (ui->fi->value()+180)/Arduino::stpFi;
+    quint16 b = (ui->betta->value()+24)/Arduino::stpBetta;
+
+    arduino.revolution(f, b);
+}
+
+void MainWindow::on_newExperiment_clicked()
+{/*
+
+    QString nameExperiment = QFileDialog::getSaveFileName(this,
+                                                          tr("New experiment file"),
+                                                          QDate::currentDate().toString("yyyy.MM.dd") + QTime::currentTime().toString("_hh.mm"),
+                                                          tr("Text (*.txt)"));
+    experiment.setFileName(nameExperiment);
+    if (nameExperiment.isEmpty()) return;
+    if (!experiment.open(QIODevice::WriteOnly)){
+        QMessageBox::critical(this, "Holly shit!", "This file doesn't want be open");
+        return;
+    }
+    experimentStream.setDevice(&experiment);
+    experimentStream << "#" << QDate::currentDate().toString("dd.MM.yyyy")
+                     << QTime::currentTime().toString(" hh:mm") << endl;
+    experimentStream << "#radius; central; difference between left and right; value right and left;"
+                        " up; down; betta; fi;" << endl;
+
+    ui->newExperiment->setText(experiment.fileName());
+*/}
+
+void MainWindow::on_oldExperiment_clicked()
+{/*
+    if(experiment.isOpen()) experiment.close();
+    QString nameExperiment = QFileDialog::getOpenFileName(this, tr("Open experiment file"), "", tr("Text file (*.txt)"));
+    if (nameExperiment.isEmpty()) return;
+
+    experiment.setFileName(nameExperiment);
+
+    if (!experiment.open(QIODevice::Append)){
+        QMessageBox::critical(this, "Holly shit!", "This file doesn't want be open");
+        return;
+    }
+    experimentStream.setDevice(&experiment);
+    experimentStream << "#" << QDate::currentDate().toString("dd.MM.yyyy")
+                     << QTime::currentTime().toString(" hh:mm") << endl;
+
+*/
 }

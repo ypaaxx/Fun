@@ -11,6 +11,7 @@
 
 #include "sensor.h"
 #include "arduino.h"
+#include "experiment.h"
 
 namespace Ui {
 class MainWindow;
@@ -39,38 +40,17 @@ private slots:
 
     void on_pushLow_clicked();
 
+    void on_pushButton_4_clicked();
+
+    void on_newExperiment_clicked();
+
+    void on_oldExperiment_clicked();
+
 private:
     Ui::MainWindow *ui;
     Arduino arduino;
+    Experiment experiment;
 
-    /* Нумерация датчиков:
-     * 0 - центральный (полное)
-     * 1 - разность левого и правого
-     * 2 - значение левого и правого
-     * 3 - верхний
-     * 4 - нижний */
-    QVector <Sensor*> *rHight;
-    QVector <Sensor*> *rMiddle;
-    QVector <Sensor*> *rLow;
-    Sensor temperature; //Температурный датчик в корпусе
-    QVector <Sensor*> allSensors; //Список всех реальных сенсоров
-    Sensor* angleHight;// Фиктивные датчики угла
-    Sensor* angleMiddle;
-    Sensor* angleLow;
-
-    // Текущие значения Fi Betta
-    qreal fiCurrent, bettaCurrent;
-
-    //Таймер
-    QTime time;
-
-    //Файлы логов
-    QFile log;
-    QTextStream logStream;
-    QFile experiment;
-    QTextStream experimentStream;
-
-    quint8 crc8(QByteArray &array, quint8 len);
     void getData(QVector<Sensor *> *radius);
 };
 
