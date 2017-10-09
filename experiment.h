@@ -19,27 +19,33 @@ public:
 
     explicit Experiment(QObject *parent = 0);
     void addData(qint8 numerSensor, quint16 value);
-    void setFile(QFile experiment);
+    void getPoint(int radius, qreal fi, qreal betta);
 
-    qreal getFiCurrent() const;
+    qreal getFiCurrent() const { return fiCurrent;}
+    qreal getBettaCurrent() const {return bettaCurrent;}
+    QVector<Sensor *> *getRHight() const {return rHight;}
+    QVector<Sensor *> *getRMiddle() const {return rMiddle;}
+    QVector<Sensor *> *getRLow() const {return rLow;}
+    Sensor *getAngleHight() const {return angleHight;}
+    Sensor *getAngleMiddle() const {return angleMiddle;}
+    Sensor *getAngleLow() const {return angleLow;}
 
-    qreal getBettaCurrent() const;
+    void setSteam(const QTextStream &value);
+    QTextStream getSteam() const;
 
-    QVector<Sensor *> *getRHight() const;
+    QFile getFile() const;
+    bool setFile(QFile *value);
 
-    QVector<Sensor *> *getRMiddle() const;
-
-    QVector<Sensor *> *getRLow() const;
-
-    Sensor *getAngleHight() const;
-
-    Sensor *getAngleMiddle() const;
-
-    Sensor *getAngleLow() const;
+    qreal getMean(quint8 numer);
+    bool isFileSet(){ return file->isOpen(); }
+    void setNull(){
+        for (Sensor* &sensor: *allSensors){
+            sensor->setCalibrationCoefficients(sensor->getMean(), 1245.41);
+        }
+    }
+    void setCallibrationCoefficient( quint8 numerSensor, qreal A, qreal B);
 
 private:
-    const qreal stpBetta = 0.125;
-    const qreal stpFi = 0.25;
 
     /* Нумерация датчиков:
      * 0 - центральный (полное)
@@ -47,11 +53,13 @@ private:
      * 2 - значение левого и правого
      * 3 - верхний
      * 4 - нижний */
+
     QVector <Sensor*> *rHight;
     QVector <Sensor*> *rMiddle;
     QVector <Sensor*> *rLow;
     Sensor *temperature; //Температурный датчик в корпусе
     QVector <Sensor*> *allSensors; //Список всех реальных сенсоров
+    QVector <QVector <Sensor*> *> *radiuses;
     Sensor* angleHight;// Фиктивные датчики угла
     Sensor* angleMiddle;
     Sensor* angleLow;
@@ -63,14 +71,10 @@ private:
     QTime *time;
     QTimer *timer;
 
-    //Файлы логов
-    QFile log;
-    QTextStream logStream;
-    QFile experiment;
-    QTextStream experimentStream;
-
-    quint8 crc8(QByteArray &array, quint8 len);
-    void getData(QVector<Sensor *> *radius);
+    //Файлы
+    QFile *file;
+    QFile *calibration;
+    QTextStream *steam;
 
 signals:
 

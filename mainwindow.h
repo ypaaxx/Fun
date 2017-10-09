@@ -26,11 +26,8 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_findArduino_clicked();
     void readData();
 
-    void on_fiStep_editingFinished();
-    void on_bettaStep_editingFinished();
     void on_betta_editingFinished();
     void on_fi_editingFinished();
 
@@ -42,16 +39,24 @@ private slots:
 
     void on_pushButton_4_clicked();
 
-    void on_newExperiment_clicked();
+    void on_actionNew_triggered();
 
-    void on_oldExperiment_clicked();
+    void on_actionFind_triggered();
+
+    void on_pushButton_clicked();
 
 private:
+    QVector <QLabel *> *labelVector;
+
     Ui::MainWindow *ui;
     Arduino arduino;
     Experiment experiment;
+    qreal fi;
+    qreal betta;
 
-    void getData(QVector<Sensor *> *radius);
+    QLabel* isArduinoHave;
+    QLabel* lastMessage;
+
 };
 
 #endif // MAINWINDOW_H

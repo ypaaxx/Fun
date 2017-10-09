@@ -2,38 +2,65 @@
 #define SENSOR_H
 
 #include <QtCharts>
+#include <QPolygonF>
 #include <QTimer>
+#include <QTime>
 
 class Sensor : public QObject
 {
     Q_OBJECT
 
-    static quint8 count;
-private:
+    static QTimer *timer;
+    static QTime *time;
 
-    quint8 id;
+private:
+    const quint8 LENGHT_AVE = 10; //длина осреднения
+    quint8 MAX_SIZE = 20;
+
+    int numberValues = 0;// Cчётчик точек
+    QList<quint16> *lastValues;
     QChart *chart;
     QChartView *view;
-    QLineSeries *lineSeries;
-    QTimer *timer;
+    QLineSeries *series;
+    qreal mean = 0;
+
+    //Таррировочные коэффициенты p(value) = A*value + B
+    qreal coefficientA;
+    qreal coefficientB;
 
 public:
     Sensor();
 
-    QChartView *getView() const { return view; }
-    QLineSeries *getSeries() const { return lineSeries; }
-    QChart *getChart() const { return chart; }
+    //Делает из сенсора не просто сенсор, а сенсор с графиками, мать его!
+    void makeChart();
 
+    // Сделает всё, дабы отображались углы как надобно
+    void makeAngle();
+
+    //Добавить новое значение. Время выставится само от статического таймера
+    void addData(int value);
+
+    //установка коэффициентов таррировки
+    void setCalibrationCoefficients(qreal A, qreal B) { coefficientA = A; coefficientB = B; }
+
+    //Давление в Па из значения по коэффициентам
+    qreal pressure(int value) {return A*value + B; }
+
+    // Кучка жалких get и set
     void setView(QChartView *view);
-    void noScroll();
-    QTimer *getTimer() const;
-
-    void setTimer(QTimer *value) { timer = value; }
+    QChartView *getView() const { return view; }
+    QLineSeries *getSeries() const { return series; }
+    qreal getMean() const { return mean; }
+    QChart *getChart() {
+        if(!chart) makeChart(); //Если нет графика
+        return chart;
+    }
 
 signals:
 
 public slots:
     void scroll_();
+
 };
 
 

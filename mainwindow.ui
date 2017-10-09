@@ -23,208 +23,6 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QLabel" name="label">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>111</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="findArduino">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>91</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="text">
-     <string>Найти ардуинку</string>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="groupBox">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>10</y>
-      <width>161</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>600</width>
-      <height>600</height>
-     </size>
-    </property>
-    <property name="layoutDirection">
-     <enum>Qt::LeftToRight</enum>
-    </property>
-    <property name="title">
-     <string>Перемещение</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-    </property>
-    <property name="flat">
-     <bool>false</bool>
-    </property>
-    <property name="checkable">
-     <bool>false</bool>
-    </property>
-    <widget class="QLabel" name="label_4">
-     <property name="geometry">
-      <rect>
-       <x>9</x>
-       <y>50</y>
-       <width>71</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Шаг по Betta</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_3">
-     <property name="geometry">
-      <rect>
-       <x>9</x>
-       <y>20</y>
-       <width>47</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Шаг по Fi</string>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="fiStep">
-     <property name="geometry">
-      <rect>
-       <x>89</x>
-       <y>20</y>
-       <width>61</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::WheelFocus</enum>
-     </property>
-     <property name="toolTip">
-      <string/>
-     </property>
-     <property name="statusTip">
-      <string/>
-     </property>
-     <property name="whatsThis">
-      <string/>
-     </property>
-     <property name="accessibleName">
-      <string/>
-     </property>
-     <property name="accessibleDescription">
-      <string/>
-     </property>
-     <property name="specialValueText">
-      <string/>
-     </property>
-     <property name="suffix">
-      <string>°</string>
-     </property>
-     <property name="minimum">
-      <double>0.250000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>5.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.250000000000000</double>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="bettaStep">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>50</y>
-       <width>61</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::WheelFocus</enum>
-     </property>
-     <property name="toolTip">
-      <string/>
-     </property>
-     <property name="statusTip">
-      <string/>
-     </property>
-     <property name="whatsThis">
-      <string/>
-     </property>
-     <property name="accessibleName">
-      <string/>
-     </property>
-     <property name="accessibleDescription">
-      <string/>
-     </property>
-     <property name="inputMethodHints">
-      <set>Qt::ImhNone</set>
-     </property>
-     <property name="frame">
-      <bool>true</bool>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-     <property name="specialValueText">
-      <string/>
-     </property>
-     <property name="suffix">
-      <string>°</string>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="minimum">
-      <double>0.125000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>5.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.125000000000000</double>
-     </property>
-     <property name="value">
-      <double>0.125000000000000</double>
-     </property>
-    </widget>
-   </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
@@ -336,100 +134,205 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>20</y>
-      <width>161</width>
-      <height>54</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QPushButton" name="newExperiment">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Начать новый эксперимент</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="oldExperiment">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Продолжить старый</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>110</y>
-      <width>921</width>
-      <height>591</height>
+      <width>883</width>
+      <height>590</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="layout">
-     <item row="2" column="1">
-      <widget class="QChartView" name="deltaPLow"/>
-     </item>
-     <item row="2" column="2">
-      <widget class="QChartView" name="pLow"/>
-     </item>
-     <item row="2" column="3">
+     <item row="2" column="5">
       <widget class="QChartView" name="fiLow"/>
      </item>
-     <item row="0" column="1">
+     <item row="0" column="2">
       <widget class="QChartView" name="deltaPHight"/>
      </item>
-     <item row="1" column="3">
+     <item row="1" column="5">
       <widget class="QChartView" name="fiMiddle"/>
      </item>
-     <item row="0" column="2">
+     <item row="0" column="4">
       <widget class="QChartView" name="pHight"/>
      </item>
-     <item row="1" column="2">
+     <item row="1" column="4">
       <widget class="QChartView" name="pMiddle"/>
      </item>
-     <item row="0" column="3">
+     <item row="0" column="5">
       <widget class="QChartView" name="fiHight"/>
      </item>
-     <item row="1" column="1">
+     <item row="1" column="2">
       <widget class="QChartView" name="deltaPMiddle"/>
      </item>
-     <item row="0" column="0">
-      <widget class="QPushButton" name="pushHight">
-       <property name="text">
-        <string>Взять</string>
-       </property>
-      </widget>
+     <item row="2" column="4">
+      <widget class="QChartView" name="pLow"/>
      </item>
-     <item row="1" column="0">
-      <widget class="QPushButton" name="pushMiddle">
-       <property name="text">
-        <string>Взять</string>
-       </property>
-      </widget>
+     <item row="2" column="2">
+      <widget class="QChartView" name="deltaPLow"/>
      </item>
-     <item row="2" column="0">
-      <widget class="QPushButton" name="pushLow">
-       <property name="text">
-        <string>Взять</string>
-       </property>
+     <item row="1" column="1">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QPushButton" name="pushMiddle">
+         <property name="text">
+          <string>Взять</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sensor_6">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sensor_7">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sensor_8">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sensor_9">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sensor_10">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="1">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QPushButton" name="pushLow">
+         <property name="text">
+          <string>Взять</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sensor_11">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sensor_12">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sensor_13">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sensor_14">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sensor_15">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="1">
+      <widget class="QGroupBox" name="groupBox">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QPushButton" name="pushHight">
+          <property name="text">
+           <string>Взять</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="sensor_1">
+          <property name="font">
+           <font>
+            <italic>false</italic>
+            <strikeout>false</strikeout>
+           </font>
+          </property>
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
+          <property name="scaledContents">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="sensor_2">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="sensor_3">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="sensor_4">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="sensor_5">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
@@ -499,7 +402,7 @@
       <string>Fi</string>
      </property>
     </widget>
-    <widget class="QLabel" name="valueFi">
+    <widget class="QLabel" name="currentFi">
      <property name="geometry">
       <rect>
        <x>70</x>
@@ -515,7 +418,7 @@
       <enum>Qt::AutoText</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="valueBetta">
+    <widget class="QLabel" name="currentBetta">
      <property name="geometry">
       <rect>
        <x>70</x>
@@ -529,11 +432,45 @@
      </property>
     </widget>
    </widget>
+   <widget class="QLabel" name="sensor_0">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>30</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>10</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Температура</string>
+    </property>
+   </widget>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
+  <widget class="QStatusBar" name="statusBar">
    <property name="enabled">
     <bool>false</bool>
    </property>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -542,29 +479,55 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
+   </widget>
+   <widget class="QMenu" name="menuArduino">
+    <property name="title">
+     <string>Arduino</string>
+    </property>
+    <addaction name="actionFind"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuArduino"/>
+   <addaction name="menuAbout"/>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <property name="enabled">
-    <bool>false</bool>
+  <action name="actionNew">
+   <property name="text">
+    <string>New...</string>
    </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
-  <widget class="QStatusBar" name="statusBar">
-   <property name="enabled">
-    <bool>false</bool>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
    </property>
-  </widget>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="text">
+    <string>Find...</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

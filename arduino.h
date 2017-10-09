@@ -9,21 +9,21 @@
 
 class Arduino : public QSerialPort
 {
-
-
 public:
     const static qreal stpBetta;
     static const qreal stpFi;
+    static const quint16 nullFi;
+    static const quint16 nullBetta;
     Arduino();
 
     /* Поиск порта с ардуинкой и подключение к нему*/
     bool findArduino();
 
     /* Отправить поворот углов */
-    void revolution(quint16 fiStep, quint16 bettaStep);
+    void revolution(qreal fi, qreal betta);
 
     /* Приём и расшифровка сообщения */
-    bool read(quint8 &numerSensor, quint16 &value, quint16 &fi, quint16 &betta);
+    bool getMessage(quint8 &numerSensor, quint16 &value, qreal &fi, qreal &betta);
 
 
 };

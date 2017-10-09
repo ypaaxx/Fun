@@ -1,31 +1,76 @@
 #include "sensor.h"
-quint8 Sensor::count = 0;
+
+QTimer *Sensor::timer = new QTimer;
+QTime *Sensor::time = new QTime;
+
 Sensor::Sensor()
 {
-    id = Sensor::count++;
+    chart = NULL;
+    series = NULL;
+    lastValues = new QList<quint16>;
+
+    //setCalibrationCoefficients(0, -1245.41);
+}
+
+void Sensor::makeChart()
+{
+    MAX_SIZE = 50;
     chart = new QChart();
-    lineSeries = new QLineSeries();
-    chart->addSeries(lineSeries);
+    series = new QLineSeries();
+    chart->addSeries(series);
     chart->legend()->hide();
     chart->createDefaultAxes();
     chart->axisX()->setRange(0, 60);
+    chart->axisX()->hide();
+    chart->axisY()->setGridLineVisible(false);
+    //chart->axisY()->setRange(-1245.41, 1245.41);
     chart->axisY()->setRange(0, 0xFFF);
-
-    connect(lineSeries, SIGNAL(pointAdded(int)), this, SLOT(scroll_()) );
-
+    connect(timer, SIGNAL(timeout()), this, SLOT(scroll_()));
 }
 
-void Sensor::setView(QChartView *view){
-    view->setChart(chart);
+void Sensor::addData(int value) {
+
+    //Если это первый вызов и таймер ещё не запущен
+    if(!timer->isActive()){
+        timer->start(1000);
+        time->start();
+    }
+
+    qreal now = time->elapsed()/1000.0;
+    if (series)
+        series->append(now, value);
+
+    if (numberValues >= LENGHT_AVE)
+        (*lastValues)[numberValues % LENGHT_AVE] = value;
+    else
+        lastValues->append(value);
+    numberValues++;
+
+    int localMean = 0;
+    for (auto value: *lastValues)
+        localMean += value;
+    mean = (qreal) localMean/LENGHT_AVE;
 }
 
 void Sensor::scroll_(){
-    qreal x = lineSeries->pointsVector().end()->x();
-    //if (x > 60)
-    //chart->axisX()->
-    chart->axisX()->setRange(x -60 +1, x +1);
+
+    static const quint8 timeLenght = 60;
+
+    int now = time->elapsed()/1000;
+    if (now < timeLenght) return;
+
+    if(series->count() > MAX_SIZE) series->removePoints(0,10);
+    if(!chart) return;
+
+    chart->axisX()->setRange(now - timeLenght, now);
 }
 
-void Sensor::noScroll(){
-    disconnect(lineSeries, SIGNAL(pointAdded(int)), this, SLOT( scroll_() ) );
+void Sensor::makeAngle()
+{
+    if(!chart) makeChart();
+    disconnect(timer, SIGNAL(timeout()), this, SLOT(scroll_()));
+    chart->axisX()->setRange(-24, 24);
+    chart->axisX()->visibleChanged(true);
+    chart->axisY()->setRange(-180, 180);
 }
+

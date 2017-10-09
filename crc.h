@@ -8,8 +8,9 @@ class Crc
 {
 public:
     Crc();
-    static quint8 crc8(const QByteArray &array, quint8 len);
+    //static quint8 crc8(const QByteArray &array, quint8 len);
     static quint8 crc8(const quint8* array, quint8 len);
+    static char crc8(const char* array, quint8 len);
 };
 
 #endif // CRC_H
