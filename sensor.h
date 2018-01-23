@@ -44,7 +44,7 @@ public:
     void setCalibrationCoefficients(qreal A, qreal B) { coefficientA = A; coefficientB = B; }
 
     //Давление в Па из значения по коэффициентам
-    qreal pressure(int value) {return A*value + B; }
+    qreal pressure(int value) {return coefficientA*value + coefficientB; }
 
     // Кучка жалких get и set
     void setView(QChartView *view);

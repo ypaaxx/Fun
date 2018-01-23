@@ -83,4 +83,70 @@ public slots:
 
 };
 
+/* Включает:
+ *      пять датчиков давления
+ *      значение радиуса */
+/* Нумерация датчиков:
+ * 0 - центральный (полное)
+ * 1 - разность левого и правого
+ * 2 - значение левого и правого
+ * 3 - верхний
+ * 4 - нижний */
+class Radius : public QObject
+{
+    Q_OBJECT
+
+public:
+    Radius(int first, QVector <Sensor*> *donor){
+        angle = new Sensor;
+        angle->makeAngle();
+        sensors = new QVector <Sensor *> (5);
+        setSensors(first, donor);
+
+        totalPressure->setChart(sensors->at(0)->getChart());
+        relativePressure->setChart(sensors->at(1)->getChart());
+
+        mainLayout = new QHBoxLayout;
+        actualData = new QVBoxLayout;
+        dataForm = new QFormLayout;
+        getButton = new QPushButton;
+
+        // Формирование главного виджета радиуса
+        mainLayout->addLayout(actualData);
+        mainLayout->addWidget(totalPressure);
+        mainLayout->addWidget(relativePressure);
+
+        actualData->addWidget(getButton);
+        actualData->addLayout(dataForm);
+
+        dataForm->addRow("p*", totalP);
+        dataForm->addRow("dp h", dPH);
+        dataForm->addRow("dp h", dPH);
+
+
+    }
+
+    //Заполнение списка сенсоров из донора начиная с позиции first
+    void setSensors(int first, QVector <Sensor*> *donor){
+        for (int i = 0; i < 5; i++)
+            sensors->replace(i, donor->at(first + i));
+        // Подключаем графики к 0 и 1 датчикам
+        sensors->at(0)->makeChart();
+        sensors->at(1)->makeChart();
+    }
+
+private:
+    QVector <Sensor *> *sensors;
+    Sensor* angle;
+    qreal radius;
+
+    QChartView *totalPressure;
+    QChartView *relativePressure;
+
+    QHBoxLayout *mainLayout;
+    QVBoxLayout *actualData;
+    QFormLayout *dataForm;
+    QPushButton *getButton;
+};
+
 #endif // EXPERIMENT_H
