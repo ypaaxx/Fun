@@ -19,13 +19,14 @@ public:
     /* Поиск порта с ардуинкой и подключение к нему*/
     bool findArduino();
 
+    /* Приём и расшифровка сообщения */
+    bool getMessage(quint8 &numerSensor, quint16 &value, qreal &fi, qreal &betta);
+public slots:
     /* Отправить поворот углов */
     void revolution(qreal fi, qreal betta);
 
-    /* Приём и расшифровка сообщения */
-    bool getMessage(quint8 &numerSensor, quint16 &value, qreal &fi, qreal &betta);
-
-
+private:
+    void findMessage(char _message[] = 0);
 };
 
 #endif // ARDUINO_H

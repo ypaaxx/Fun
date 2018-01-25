@@ -30,29 +30,26 @@ private slots:
 
     void on_betta_editingFinished();
     void on_fi_editingFinished();
-
-    void on_pushHight_clicked();
-
-    void on_pushMiddle_clicked();
-
-    void on_pushLow_clicked();
-
-    void on_pushButton_4_clicked();
-
-    void on_actionNew_triggered();
-
+    void move();
     void on_actionFind_triggered();
-
-    void on_pushButton_clicked();
-
 private:
     QVector <QLabel *> *labelVector;
 
     Ui::MainWindow *ui;
     Arduino arduino;
     Experiment experiment;
-    qreal fi;
+
+    Radius *upper;
+    Radius *middle;
+    Radius *lower;
+
+    qreal fi;//Переменные положения
     qreal betta;
+    QLabel *currentFi; //Полученные от ардуины положения
+    QLabel *currentBetta;
+    QDoubleSpinBox *nextFi; //Следующие положения
+    QDoubleSpinBox *nextBetta;
+
 
     QLabel* isArduinoHave;
     QLabel* lastMessage;

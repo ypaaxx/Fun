@@ -14,40 +14,59 @@ MainWindow::MainWindow(QWidget *parent) :
     lastMessage = new QLabel(this);
     statusBar()->addWidget(lastMessage);
 
-    labelVector = new QVector <QLabel*>;
-    *labelVector << ui->sensor_0;
-    *labelVector << ui->sensor_1;
-    *labelVector << ui->sensor_2;
-    *labelVector << ui->sensor_3;
-    *labelVector << ui->sensor_4;
-    *labelVector << ui->sensor_5;
-    *labelVector << ui->sensor_6;
-    *labelVector << ui->sensor_7;
-    *labelVector << ui->sensor_8;
-    *labelVector << ui->sensor_9;
-    *labelVector << ui->sensor_10;
-    *labelVector << ui->sensor_11;
-    *labelVector << ui->sensor_12;
-    *labelVector << ui->sensor_13;
-    *labelVector << ui->sensor_14;
-    *labelVector << ui->sensor_15;
+    /* Начало исправления всего */
+    //Три насадка
+    upper = new Radius;
+    middle = new Radius;
+    lower = new Radius;
 
-    /* Назначение графиков разности давлений */
-    ui->deltaPHight->setChart(experiment.getRHight()->at(1)->getChart());
-    ui->deltaPMiddle->setChart(experiment.getRMiddle()->at(1)->getChart());
-    ui->deltaPLow->setChart(experiment.getRLow()->at(1)->getChart());
+    upper->setFiBetta(&fi, &betta);
+    middle->setFiBetta(&fi, &betta);
+    lower->setFiBetta(&fi, &betta);
 
-    /* Назначение графиков полных давлений */
-    ui->pHight->setChart(experiment.getRHight()->at(0)->getChart());
-    ui->pMiddle->setChart(experiment.getRMiddle()->at(0)->getChart());
-    ui->pLow->setChart(experiment.getRLow()->at(0)->getChart());
+    // Наполнение списка датчиков
+    auto allSensors = new QVector <Sensor*>;
+    *allSensors << new Sensor; // температурный датчик
+    allSensors->append( *(upper->getListSensors()) );
+    allSensors->append( *(middle->getListSensors()) );
+    allSensors->append( *(lower->getListSensors()) );
+    experiment.setAllSensors(allSensors);
 
-    /* Назначение графиков углов */
-    ui->fiHight->setChart(experiment.getAngleHight()->getChart());
-    ui->fiMiddle->setChart(experiment.getAngleMiddle()->getChart());
-    ui->fiLow->setChart(experiment.getAngleLow()->getChart());
+    /* Формирование окна */
+    auto maineLayout = new QVBoxLayout; //Главный вертикальный лайоут
+    auto positionLayout = new QHBoxLayout; //Горизонтальный в котором содержится всё относительно позиций
+    positionLayout->addStretch(1);  //Позиции слева
+    maineLayout->addLayout(positionLayout); //Сверху позиции
+    maineLayout->addLayout(upper->getWidget()); //потом верхний насадок
+    maineLayout->addLayout(middle->getWidget());
+    maineLayout->addLayout(lower->getWidget());
+    currentFi = new QLabel; //Полученные от ардуины положения
+    currentBetta = new QLabel;
+    nextFi = new QDoubleSpinBox; //Следующие положения
+    nextFi->setSingleStep(Arduino::stpFi);
+    nextBetta = new QDoubleSpinBox;
+    nextFi->setSingleStep(Arduino::stpBetta);
+    auto goToNext = new QPushButton("Переместить"); // Кнопка отправки на ардуино
+    connect(goToNext, SIGNAL(clicked(bool)), this, SLOT(move()));
+    auto currentForm = new QFormLayout;
+    currentForm->addRow("fi", currentFi);
+    currentForm->addRow("betta", currentBetta);
+    auto nextPosition = new QVBoxLayout;
+    nextPosition->addWidget(nextFi);
+    nextPosition->addWidget(nextBetta);
+    //Корректеровка вписанных значений.
+    connect(nextFi, SIGNAL(editingFinished()), this, SLOT(on_fi_editingFinished()));
+    connect(nextBetta, SIGNAL(editingFinished()), this, SLOT(on_betta_editingFinished()));
+    positionLayout->addLayout(currentForm); // Наполнение блока позиций
+    positionLayout->addLayout(nextPosition);
+    positionLayout->addWidget(goToNext);
 
-    //А вдруг она уже подключена?
+    //Установка главного лайоута главным
+    QWidget *window = new QWidget(this);
+    window->setLayout(maineLayout);
+    setCentralWidget(window);
+
+    //А вдруг база уже подключена?
     on_actionFind_triggered();
 }
 
@@ -66,89 +85,86 @@ void MainWindow::readData()
     quint16 value;
 
     /* При совпадении crc запись в лог и серии датчика */
-    if(arduino.getMessage(numerSensor, value, fi, betta))
+    if(arduino.getMessage(numerSensor, value, fi, betta)){
         experiment.addData(numerSensor, value);
+        currentBetta->setText(QString::number(betta));
+        currentFi->setText(QString::number(fi));
+    }
     else
         return;
 
-    qreal mean = experiment.getMean(numerSensor);
-
-    labelVector->at(numerSensor)->setText(QString::number(mean));
-    //if (qFabs(mean-value)/mean > 0.05)  labelVector->at(numerSensor)->setFont(QFont::Bold);
     lastMessage->setText(QString::number(numerSensor) + " " + QString::number(value));
-
-    ui->currentFi->setText(QString::number(fi) + "°");
-    ui->currentBetta->setText(QString::number(betta) + "°");
-
-
 }
 
+/* Выставляют кратный шагам угол при редактировании */
 void MainWindow::on_betta_editingFinished()
 {
-    double step = ui->betta->value();
+    double step = nextBetta->value();
     int nStep = step/Arduino::stpBetta;
     step = Arduino::stpBetta*nStep;
-    ui->betta->setValue(step);
+    nextBetta->setValue(step);
 }
 void MainWindow::on_fi_editingFinished()
 {
-    double step = ui->fi->value();
+    double step = nextFi->value();
     int nStep = step/Arduino::stpFi;
     step = Arduino::stpFi*nStep;
-    ui->fi->setValue(step);
+    nextFi->setValue(step);
 }
 
-/* Взятие данных с верхнего радиуса */
-void MainWindow::on_pushHight_clicked()
+///* Взятие данных с верхнего радиуса */
+//void MainWindow::on_pushHight_clicked()
+//{
+//    if (!experiment.isFileSet()) {
+//        QMessageBox::critical(this, "Holly shit!", "File doesn't open");
+//        return;
+//    }
+//    experiment.getPoint(2, fi, betta);
+//}
+
+//void MainWindow::on_pushMiddle_clicked()
+//{
+//    if (!experiment.isFileSet()) {
+//        QMessageBox::critical(this, "Holly shit!", "File doesn't open");
+//        return;
+//    }
+//    experiment.getPoint(1, fi, betta);
+//}
+
+//void MainWindow::on_pushLow_clicked()
+//{
+//    if (!experiment.isFileSet()) {
+//        QMessageBox::critical(this, "Holly shit!", "File doesn't open");
+//        return;
+//    }
+//    experiment.getPoint(0, fi, betta);
+//}
+
+///* Поворот шагового двигателя */
+void MainWindow::move()
 {
-    if (!experiment.isFileSet()) {
-        QMessageBox::critical(this, "Holly shit!", "File doesn't open");
-        return;
-    }
-    experiment.getPoint(2, fi, betta);
-}
-
-void MainWindow::on_pushMiddle_clicked()
-{
-    if (!experiment.isFileSet()) {
-        QMessageBox::critical(this, "Holly shit!", "File doesn't open");
-        return;
-    }
-    experiment.getPoint(1, fi, betta);
-}
-
-void MainWindow::on_pushLow_clicked()
-{
-    if (!experiment.isFileSet()) {
-        QMessageBox::critical(this, "Holly shit!", "File doesn't open");
-        return;
-    }
-    experiment.getPoint(0, fi, betta);
-}
-
-/* Поворот шагового двигателя */
-void MainWindow::on_pushButton_4_clicked()
-{
-    arduino.revolution(ui->fi->value(), ui->betta->value());
+    fi = nextFi->value();
+    betta = nextBetta->value();
+    arduino.revolution(fi, betta);
 }
 
 
-/* Открытие нового файла эксперемента */
-void MainWindow::on_actionNew_triggered()
-{
-    QString nameExperiment = QFileDialog::getSaveFileName(this,
-                                                          tr("New experiment file"),
-                                                          QDate::currentDate().toString("yyyy.MM.dd") + QTime::currentTime().toString("_hh.mm"),
-                                                          tr("Text (*.txt)"));
-    if (nameExperiment.isEmpty()) return;
+///* Открытие нового файла эксперемента */
+//void MainWindow::on_actionNew_triggered()
+//{
+//    QString nameExperiment = QFileDialog::getSaveFileName(this,
+//                                                          tr("New experiment file"),
+//                                                          QDate::currentDate().toString("yyyy.MM.dd") + QTime::currentTime().toString("_hh.mm"),
+//                                                          tr("Text (*.txt)"));
+//    if (nameExperiment.isEmpty()) return;
 
-    if ( !experiment.setFile(new QFile(nameExperiment))) {
-        QMessageBox::critical(this, "Holly shit!", "This file doesn't want be open");
-        return;
-    }
+//    if ( !experiment.setFile(new QFile(nameExperiment))) {
+//        QMessageBox::critical(this, "Holly shit!", "This file doesn't want be open");
+//        return;
+//    }
 
-    this->setWindowTitle("Fun base - " + nameExperiment);
-}
+//    this->setWindowTitle("Fun base - " + nameExperiment);
+//}
 
 /* При нажатии на поиск ардуинки вызывает функцию поиска findArduino
  * и при успехе конектит readyRead ардуины к слоту readData
@@ -171,9 +187,4 @@ void MainWindow::on_actionFind_triggered()
     connect(&arduino, &Arduino::readyRead, this, &MainWindow::readData);
 
     if(arduino.bytesAvailable()) readData();
-}
-
-void MainWindow::on_pushButton_clicked()
-{
-    experiment.setNull();
 }

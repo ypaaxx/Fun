@@ -21,7 +21,7 @@ private:
     QList<quint16> *lastValues;
     QChart *chart;
     QChartView *view;
-    QLineSeries *series;
+    QXYSeries *series;
     qreal mean = 0;
 
     //Таррировочные коэффициенты p(value) = A*value + B
@@ -49,7 +49,7 @@ public:
     // Кучка жалких get и set
     void setView(QChartView *view);
     QChartView *getView() const { return view; }
-    QLineSeries *getSeries() const { return series; }
+    QXYSeries *getSeries() const { return series; }
     qreal getMean() const { return mean; }
     QChart *getChart() {
         if(!chart) makeChart(); //Если нет графика
@@ -57,6 +57,7 @@ public:
     }
 
 signals:
+    void newMean(QString);
 
 public slots:
     void scroll_();

@@ -15,8 +15,8 @@ Sensor::Sensor()
 void Sensor::makeChart()
 {
     MAX_SIZE = 50;
-    chart = new QChart();
-    series = new QLineSeries();
+    chart = new QChart;
+    series = new QLineSeries;
     chart->addSeries(series);
     chart->legend()->hide();
     chart->createDefaultAxes();
@@ -50,6 +50,8 @@ void Sensor::addData(int value) {
     for (auto value: *lastValues)
         localMean += value;
     mean = (qreal) localMean/LENGHT_AVE;
+
+    newMean(QString::number(mean));
 }
 
 void Sensor::scroll_(){
@@ -68,6 +70,8 @@ void Sensor::scroll_(){
 void Sensor::makeAngle()
 {
     if(!chart) makeChart();
+    delete series;
+    series = new QScatterSeries;
     disconnect(timer, SIGNAL(timeout()), this, SLOT(scroll_()));
     chart->axisX()->setRange(-24, 24);
     chart->axisX()->visibleChanged(true);

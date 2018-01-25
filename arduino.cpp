@@ -1,5 +1,6 @@
 #include "arduino.h"
 #include <QDataStream>
+#include <QQueue>
 #include <QThread>
 
 const qreal Arduino::stpBetta = 0.125;
@@ -44,6 +45,7 @@ bool Arduino::findArduino()
     return 0;
 }
 
+/* Отправка новых значений углов которые необходимо выставить */
 void Arduino::revolution(qreal fi, qreal betta)
 {
     quint16 stepFi = fi/stpFi + nullFi;
@@ -79,7 +81,7 @@ bool Arduino::getMessage(quint8 &numerSensor, quint16 &value, qreal &fi, qreal &
     //Когда контрольные суммы не совпали, начинает искать смещение выкидывая один пришедший байт
     if (message[7] != Crc::crc8(message, 7)) {
         qDebug() << "Не совпали CRC";
-        QThread::msleep(50);
+        QThread::msleep(1000);
         if(bytesAvailable())
             getChar(NULL);
         return false;
@@ -94,3 +96,4 @@ bool Arduino::getMessage(quint8 &numerSensor, quint16 &value, qreal &fi, qreal &
 
     return true;
 }
+
