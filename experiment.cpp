@@ -7,10 +7,8 @@ Experiment::Experiment(QObject *parent) : QObject(parent)
 // Добавить новое значение на датчике
 void Experiment::addData(qint8 numerSensor, quint16 value)
 {
-    if (numerSensor > allSensors->length()) qDebug() << "numerSensor > allSensors->length()";
     allSensors->at(numerSensor)->addData(value);
-
-    qDebug() << numerSensor << value;
+    //qDebug() << numerSensor << value;
 }
 
 bool Experiment::setFile( QFile *value){

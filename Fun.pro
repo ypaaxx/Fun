@@ -30,17 +30,20 @@ SOURCES += main.cpp\
     arduino.cpp \
     sensor.cpp \
     crc.cpp \
-    experiment.cpp
+    experiment.cpp \
+    radius.cpp
 
 HEADERS  += mainwindow.h \
     arduino.h \
     sensor.h \
     crc.h \
-    experiment.h
+    experiment.h \
+    radius.h
 
-FORMS    += mainwindow.ui
+FORMS    +=
 
 DISTFILES += \
-    Описание_протокола.txt
+    Описание_протокола.txt \
+    Logo.png
 
 

@@ -12,6 +12,7 @@
 #include "sensor.h"
 #include "arduino.h"
 #include "experiment.h"
+#include "radius.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +26,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+
 private slots:
     void readData();
 
@@ -32,6 +34,22 @@ private slots:
     void on_fi_editingFinished();
     void move();
     void on_actionFind_triggered();
+
+    void calibration(){
+        QString fileName = QFileDialog::getOpenFileName(this,
+                                                        tr("New experiment file"),
+                                                        QDate::currentDate().toString("yyyy.MM.dd") + QTime::currentTime().toString("_hh.mm"),
+                                                        tr("Text (*.txt)"));
+        if (fileName.isEmpty()) return;
+
+        if ( !experiment.setCalibrationFile(new QFile(fileName))) {
+            QMessageBox::critical(this, "Holly shit!", "This file doesn't want be open");
+            return;
+        }
+
+        this->setWindowTitle("Fun base - " + fileName);
+    }
+
 private:
     QVector <QLabel *> *labelVector;
 
@@ -53,6 +71,7 @@ private:
 
     QLabel* isArduinoHave;
     QLabel* lastMessage;
+
 
 };
 

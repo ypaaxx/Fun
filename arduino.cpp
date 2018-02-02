@@ -34,13 +34,12 @@ bool Arduino::findArduino()
                     || (port.vendorIdentifier() == 0x1A86))
                 if ( port.productIdentifier() == 0x7523){
                     //qDebug() << "Product ID: " << hex << "0x" << port.productIdentifier();
-                    qDebug() << "On" << port.portName();
+                    qDebug() << "Base found on" << port.portName();
                     setPort(port);
                     open(QIODevice::ReadWrite);
                     return 1;
                 }
     }
-
     //Происходит если ничего не нашёл
     return 0;
 }
@@ -93,6 +92,8 @@ bool Arduino::getMessage(quint8 &numerSensor, quint16 &value, qreal &fi, qreal &
     fi = (fiStep - nullFi) * stpFi;
     quint16 bettaStep = ( message[5] << 8) + (quint8) message[6];
     betta = (bettaStep - nullBetta) * stpBetta;
+
+    //qDebug() << "Arduino::getMessage" << fi << betta;
 
     return true;
 }

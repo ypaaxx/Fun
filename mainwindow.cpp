@@ -2,11 +2,10 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    QMainWindow(parent)
 {
-    ui->setupUi(this);
-    this->setWindowTitle("Fun base");
+    setWindowTitle("Fun base");
+    window()->setWindowIcon(QIcon("Logo.png"));
 
     isArduinoHave = new QLabel(this);
     statusBar()->addWidget(isArduinoHave);
@@ -45,7 +44,8 @@ MainWindow::MainWindow(QWidget *parent) :
     nextFi = new QDoubleSpinBox; //Следующие положения
     nextFi->setSingleStep(Arduino::stpFi);
     nextBetta = new QDoubleSpinBox;
-    nextFi->setSingleStep(Arduino::stpBetta);
+    nextBetta->setDecimals(3);
+    nextBetta->setSingleStep(Arduino::stpBetta);
     auto goToNext = new QPushButton("Переместить"); // Кнопка отправки на ардуино
     connect(goToNext, SIGNAL(clicked(bool)), this, SLOT(move()));
     auto currentForm = new QFormLayout;
@@ -68,12 +68,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //А вдруг база уже подключена?
     on_actionFind_triggered();
+
+    calibration();
+
 }
 
 MainWindow::~MainWindow()
 {
     if (arduino.isOpen()) arduino.close();
-    delete ui;
+    //delete ui;
 }
 
 
@@ -89,11 +92,10 @@ void MainWindow::readData()
         experiment.addData(numerSensor, value);
         currentBetta->setText(QString::number(betta));
         currentFi->setText(QString::number(fi));
-    }
-    else
+    } else
         return;
 
-    lastMessage->setText(QString::number(numerSensor) + " " + QString::number(value));
+    //lastMessage->setText(QString::number(numerSensor) + " " + QString::number(value));
 }
 
 /* Выставляют кратный шагам угол при редактировании */
@@ -112,35 +114,7 @@ void MainWindow::on_fi_editingFinished()
     nextFi->setValue(step);
 }
 
-///* Взятие данных с верхнего радиуса */
-//void MainWindow::on_pushHight_clicked()
-//{
-//    if (!experiment.isFileSet()) {
-//        QMessageBox::critical(this, "Holly shit!", "File doesn't open");
-//        return;
-//    }
-//    experiment.getPoint(2, fi, betta);
-//}
-
-//void MainWindow::on_pushMiddle_clicked()
-//{
-//    if (!experiment.isFileSet()) {
-//        QMessageBox::critical(this, "Holly shit!", "File doesn't open");
-//        return;
-//    }
-//    experiment.getPoint(1, fi, betta);
-//}
-
-//void MainWindow::on_pushLow_clicked()
-//{
-//    if (!experiment.isFileSet()) {
-//        QMessageBox::critical(this, "Holly shit!", "File doesn't open");
-//        return;
-//    }
-//    experiment.getPoint(0, fi, betta);
-//}
-
-///* Поворот шагового двигателя */
+/* Поворот шагового двигателя */
 void MainWindow::move()
 {
     fi = nextFi->value();
@@ -150,7 +124,7 @@ void MainWindow::move()
 
 
 ///* Открытие нового файла эксперемента */
-//void MainWindow::on_actionNew_triggered()
+//void MainWindow::newFile()
 //{
 //    QString nameExperiment = QFileDialog::getSaveFileName(this,
 //                                                          tr("New experiment file"),

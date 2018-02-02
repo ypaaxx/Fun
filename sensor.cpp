@@ -9,26 +9,26 @@ Sensor::Sensor()
     series = NULL;
     lastValues = new QList<quint16>;
 
-    //setCalibrationCoefficients(0, -1245.41);
+    setCalibrationCoefficients(1, 0);
 }
 
-void Sensor::makeChart()
+void Sensor::makeChart(QObject *parent)
 {
+    if(chart != NULL) return;
     MAX_SIZE = 50;
-    chart = new QChart;
-    series = new QLineSeries;
+    chart = new QChart();
+    series = new QLineSeries(parent);
     chart->addSeries(series);
     chart->legend()->hide();
     chart->createDefaultAxes();
     chart->axisX()->setRange(0, 60);
     chart->axisX()->hide();
     chart->axisY()->setGridLineVisible(false);
-    //chart->axisY()->setRange(-1245.41, 1245.41);
     chart->axisY()->setRange(0, 0xFFF);
     connect(timer, SIGNAL(timeout()), this, SLOT(scroll_()));
 }
 
-void Sensor::addData(int value) {
+void Sensor::addData(int _value) {
 
     //Если это первый вызов и таймер ещё не запущен
     if(!timer->isActive()){
@@ -37,6 +37,7 @@ void Sensor::addData(int value) {
     }
 
     qreal now = time->elapsed()/1000.0;
+    qreal value = coefficientA*_value + coefficientB;
     if (series)
         series->append(now, value);
 
