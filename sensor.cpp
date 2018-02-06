@@ -20,6 +20,7 @@ void Sensor::makeChart(QObject *parent)
     series = new QLineSeries(parent);
     chart->addSeries(series);
     chart->legend()->hide();
+    chart->setMargins(QMargins(0,0,0,0));
     chart->createDefaultAxes();
     chart->axisX()->setRange(0, 60);
     chart->axisX()->hide();
@@ -67,15 +68,3 @@ void Sensor::scroll_(){
 
     chart->axisX()->setRange(now - timeLenght, now);
 }
-
-void Sensor::makeAngle()
-{
-    if(!chart) makeChart();
-    delete series;
-    series = new QScatterSeries;
-    disconnect(timer, SIGNAL(timeout()), this, SLOT(scroll_()));
-    chart->axisX()->setRange(-24, 24);
-    chart->axisX()->visibleChanged(true);
-    chart->axisY()->setRange(-180, 180);
-}
-

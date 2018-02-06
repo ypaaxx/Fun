@@ -20,9 +20,13 @@
  * 2 - значение левого и правого
  * 3 - верхний
  * 4 - нижний */
+
+
 class Radius : public QObject
 {
     Q_OBJECT
+
+    QScatterSeries *actualPoint;
 public:
     Radius();
 
@@ -34,12 +38,13 @@ public:
         sensors->at(0)->makeChart();
         sensors->at(1)->makeChart();
     }
-
+    void setOutput(QTextStream *_output){
+        output = _output;
+    }
     //Выдаёт указатель на список ссылок на датчики
     QVector <Sensor *> *getListSensors(){
         return sensors;
     }
-
     //Установка значений радиуса закрепления (мм)
     void setRadius(qreal _radiusMm){
         radius = _radiusMm;
@@ -47,22 +52,34 @@ public:
     qreal getRadius(){
         return radius;
     }
-
     //Указание положения
     void setFiBetta(qreal* _fi, qreal* _betta){
         fi = _fi;
         betta = _betta;
     }
-
     //Выдача главного виджета
     QHBoxLayout *getWidget(){
         return mainLayout;
+    }
+
+public slots:
+    void moveBettaActual(double betta){
+        qreal fi = actualPoint->at(0).y();
+        actualPoint->replace(0, betta, fi);
+    }
+    void moveFiActual(double fi){
+        qreal betta = actualPoint->at(0).x();
+        actualPoint->replace(0, betta, fi);
     }
 
 private:
     QVector <Sensor *> *sensors;    //Список сенсоров насадка
     Sensor* angle;                  //Фиктивный сенсор угла
     qreal radius;                   //Радиус закрепления (мм)
+
+    QScatterSeries *angleSeries;
+    QScatterSeries *actualPosition;
+    QTextStream *output;
 
     //Указатели на текущее положение
     qreal* fi;
@@ -80,18 +97,17 @@ private:
     QPushButton *button;
 
     //Средние значения в датчиках
-    QLineEdit *totalP;
-    QLineEdit *dPH;
-    QLineEdit *pH;
-    QLineEdit *pUp;
-    QLineEdit *pDown;
+    QLabel *totalP;
+    QLabel *dPH;
+    QLabel *pH;
+    QLabel *pUp;
+    QLabel *pDown;
 
+    void actualPointSetting();
 private slots:
 
     /* При нажатии кнопки Взять */
-    void getPoint(){
-        angle->getSeries()->append(*betta, *fi);
-    }
+    void getPoint();
 
     /* Открытие дополнительного окна с единственным графиком */
     void chartOnNewWindow(int num){

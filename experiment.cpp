@@ -8,10 +8,9 @@ Experiment::Experiment(QObject *parent) : QObject(parent)
 void Experiment::addData(qint8 numerSensor, quint16 value)
 {
     allSensors->at(numerSensor)->addData(value);
-    //qDebug() << numerSensor << value;
 }
 
-bool Experiment::setFile( QFile *value){
+bool Experiment::setFile(QFile *value){
     try {
         value->open(QIODevice::ReadWrite);
         steam = new QTextStream (value);

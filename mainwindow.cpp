@@ -4,7 +4,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    setWindowTitle("Fun base");
+    setWindowTitle("FunBase");
     window()->setWindowIcon(QIcon("Logo.png"));
 
     isArduinoHave = new QLabel(this);
@@ -18,6 +18,10 @@ MainWindow::MainWindow(QWidget *parent) :
     upper = new Radius;
     middle = new Radius;
     lower = new Radius;
+
+    upper->setObjectName("upper");
+    middle->setObjectName("middle");
+    lower->setObjectName("lower");
 
     upper->setFiBetta(&fi, &betta);
     middle->setFiBetta(&fi, &betta);
@@ -41,11 +45,22 @@ MainWindow::MainWindow(QWidget *parent) :
     maineLayout->addLayout(lower->getWidget());
     currentFi = new QLabel; //Полученные от ардуины положения
     currentBetta = new QLabel;
+    /* Настройка выбора позиции */
     nextFi = new QDoubleSpinBox; //Следующие положения
     nextFi->setSingleStep(Arduino::stpFi);
+    nextFi->setRange(-180, 180);
     nextBetta = new QDoubleSpinBox;
     nextBetta->setDecimals(3);
     nextBetta->setSingleStep(Arduino::stpBetta);
+    nextBetta->setRange(-24,24);
+
+    connect(nextBetta, SIGNAL(valueChanged(double)), upper, SLOT(moveBettaActual(double)));
+    connect(nextFi, SIGNAL(valueChanged(double)), upper, SLOT(moveFiActual(double)));
+    connect(nextBetta, SIGNAL(valueChanged(double)), middle, SLOT(moveBettaActual(double)));
+    connect(nextFi, SIGNAL(valueChanged(double)), middle, SLOT(moveFiActual(double)));
+    connect(nextBetta, SIGNAL(valueChanged(double)), lower, SLOT(moveBettaActual(double)));
+    connect(nextFi, SIGNAL(valueChanged(double)), lower, SLOT(moveFiActual(double)));
+
     auto goToNext = new QPushButton("Переместить"); // Кнопка отправки на ардуино
     connect(goToNext, SIGNAL(clicked(bool)), this, SLOT(move()));
     auto currentForm = new QFormLayout;
@@ -69,16 +84,17 @@ MainWindow::MainWindow(QWidget *parent) :
     //А вдруг база уже подключена?
     on_actionFind_triggered();
 
-    calibration();
+    //Установка таррировочных кривых
+    calibration("calibration.txt");
 
+    // Не смей включать без записи в фаил
+    newFile();
 }
 
 MainWindow::~MainWindow()
 {
     if (arduino.isOpen()) arduino.close();
-    //delete ui;
 }
-
 
 /* Вызывается при появлении данных от ардуинки, читает сообщение
  * проверяет, пишет куда надо */
@@ -88,14 +104,15 @@ void MainWindow::readData()
     quint16 value;
 
     /* При совпадении crc запись в лог и серии датчика */
-    if(arduino.getMessage(numerSensor, value, fi, betta)){
+    if (arduino.getMessage(numerSensor, value, fi, betta)){
         experiment.addData(numerSensor, value);
         currentBetta->setText(QString::number(betta));
         currentFi->setText(QString::number(fi));
-    } else
-        return;
-
-    //lastMessage->setText(QString::number(numerSensor) + " " + QString::number(value));
+        if ((nextBetta->value() == betta)
+                &&(nextFi->value() == fi))
+            //Добавить изменение цвета при совпадении
+            ;
+    }
 }
 
 /* Выставляют кратный шагам угол при редактировании */
@@ -122,23 +139,45 @@ void MainWindow::move()
     arduino.revolution(fi, betta);
 }
 
+/* Открытие нового файла эксперемента */
+void MainWindow::newFile()
+{
+    QString nameExperiment = QFileDialog::getSaveFileName(this,
+                                                          tr("New experiment file"),
+                                                          QDate::currentDate().toString("yyyy.MM.dd") + QTime::currentTime().toString("_hh.mm"),
+                                                          tr("Text (*.txt)"));
+    if (nameExperiment.isEmpty()) return;
 
-///* Открытие нового файла эксперемента */
-//void MainWindow::newFile()
-//{
-//    QString nameExperiment = QFileDialog::getSaveFileName(this,
-//                                                          tr("New experiment file"),
-//                                                          QDate::currentDate().toString("yyyy.MM.dd") + QTime::currentTime().toString("_hh.mm"),
-//                                                          tr("Text (*.txt)"));
-//    if (nameExperiment.isEmpty()) return;
+    auto file = new QFile(nameExperiment);
+    if ( !experiment.setFile(file)) {
+        QMessageBox::critical(this, "Holly shit!", "This file doesn't want be open");
+        delete file;
+        return;
+    }
+    auto output = new QTextStream(file);
+    upper->setOutput(output);
+    lower->setOutput(output);
+    middle->setOutput(output);
 
-//    if ( !experiment.setFile(new QFile(nameExperiment))) {
-//        QMessageBox::critical(this, "Holly shit!", "This file doesn't want be open");
-//        return;
-//    }
+    this->setWindowTitle("FunBase - " + nameExperiment);
+}
 
-//    this->setWindowTitle("Fun base - " + nameExperiment);
-//}
+/* Установка файла с таррировочными коэффициентами */
+void MainWindow::calibration(QString fileName){
+    //Если не указано имя, открывается диалоговый выбора файла
+    if (fileName == NULL)
+        fileName = QFileDialog::getOpenFileName(this,
+                                                tr("New experiment file"),
+                                                QDate::currentDate().toString("yyyy.MM.dd") + QTime::currentTime().toString("_hh.mm"),
+                                                tr("Text (*.txt)"));
+    auto file = new QFile(fileName);
+    //Если метод установки выернул каку, всё заново с диалоговым окном
+    if ( !experiment.setCalibrationFile(file)) {
+        calibration();
+        delete file;
+    }
+    return;
+}
 
 /* При нажатии на поиск ардуинки вызывает функцию поиска findArduino
  * и при успехе конектит readyRead ардуины к слоту readData

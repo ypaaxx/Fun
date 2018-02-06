@@ -19,7 +19,6 @@ public:
 
     explicit Experiment(QObject *parent = 0);
     void addData(qint8 numerSensor, quint16 value);
-    void getPoint(int radius, qreal fi, qreal betta);
 
     //Установка списка датчиков извне
     void setAllSensors(QVector <Sensor*> *_allSensors){
@@ -36,7 +35,7 @@ public:
 
     bool setCalibrationFile(QFile *file){
         qDebug() << "Set calibration coefficient from file" << file->fileName();
-        file->open(QIODevice::ReadOnly);
+        if (!file->open(QIODevice::ReadOnly)) return false;
 
         steam = new QTextStream (file);
         int numSensor;
@@ -55,6 +54,7 @@ public:
                 B = arr.at(2).toDouble() ;
             } catch (...){
                 qDebug() << "Неформат";
+                return false;
             }
 
             allSensors->at(numSensor)->setCalibrationCoefficients(A, B);
@@ -62,7 +62,7 @@ public:
         delete steam;
         file->close();
 
-        return TRUE;
+        return true;
     }
 
 

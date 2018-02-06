@@ -26,29 +26,14 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-
 private slots:
     void readData();
-
     void on_betta_editingFinished();
     void on_fi_editingFinished();
     void move();
     void on_actionFind_triggered();
-
-    void calibration(){
-        QString fileName = QFileDialog::getOpenFileName(this,
-                                                        tr("New experiment file"),
-                                                        QDate::currentDate().toString("yyyy.MM.dd") + QTime::currentTime().toString("_hh.mm"),
-                                                        tr("Text (*.txt)"));
-        if (fileName.isEmpty()) return;
-
-        if ( !experiment.setCalibrationFile(new QFile(fileName))) {
-            QMessageBox::critical(this, "Holly shit!", "This file doesn't want be open");
-            return;
-        }
-
-        this->setWindowTitle("Fun base - " + fileName);
-    }
+    void newFile();
+    void calibration(QString fileName = NULL);
 
 private:
     QVector <QLabel *> *labelVector;
@@ -68,11 +53,8 @@ private:
     QDoubleSpinBox *nextFi; //Следующие положения
     QDoubleSpinBox *nextBetta;
 
-
     QLabel* isArduinoHave;
     QLabel* lastMessage;
-
-
 };
 
 #endif // MAINWINDOW_H
